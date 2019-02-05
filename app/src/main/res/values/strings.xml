@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Quick List</string>
+    <string name="action_settings">Settings</string>
+    <string name="items">Items:</string>
+    <string name="timer">Timer:</string>
+    <integer name="delay_timer">500</integer>
+
+</resources>
