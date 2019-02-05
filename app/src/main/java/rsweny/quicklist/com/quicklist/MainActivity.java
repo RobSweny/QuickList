@@ -3,9 +3,6 @@ package rsweny.quicklist.com.quicklist;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -128,12 +125,19 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("ClickableViewAccessibility")
     public void updateItems () {
 
+        // Get the current number of user items
         int itemCount = userItems.size();
+
+        // Create an array to hold the buttons
         final Button[] btn = new Button[itemCount];
+
         // Refresh view
         scrollerlinearlayout.removeAllViews();
 
-        for (int i = 0; i < userItems.size(); i++) {
+        // For each item in UserItems.size create a new button
+        // This will refresh each time a new item is added or deleted
+
+        for (int i = 0; i < itemCount; i++) {
             // Add a new button per items in list
             btn[i] = new Button(this);
             btn[i].setId(i);
@@ -158,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
                         public boolean onTouch(View v, MotionEvent event) {
                             CurrentBtn = finalI;
                             switch (event.getAction()) {
-                                case MotionEvent.ACTION_DOWN:;
+                                case MotionEvent.ACTION_DOWN:
                                     x1 = (int) event.getX();
                                     x2 = (int) event.getX();
                                     break;
@@ -171,10 +175,8 @@ public class MainActivity extends AppCompatActivity {
                                         btn[finalI].setX(initialStartingButtonPosition);
                                     }
 
-                                    // Check if user swipes left or right
-                                    if (deltaX < 0) {
-                                        // Right to left swipe
-                                    }else if(deltaX > 0){
+                                    // Check if user swipes right
+                                    if (deltaX > 0){
                                         dialogTriggered = true;
 
                                         final Dialog dialog = new Dialog(MainActivity.this);
@@ -240,8 +242,9 @@ public class MainActivity extends AppCompatActivity {
                                         int currentButtonPositionInt = (int) btn[finalI].getX();
                                         Log.i("Button position", String.valueOf(currentButtonPositionInt));
 
-                                        if(currentButtonPositionInt < 350){
+                                        if(currentButtonPositionInt > 350){
                                             // Set the button to half delete
+                                            // TODO 1: Issue where user swipes right slowly, not registering as a motion but still triggering button change.
                                             btn[finalI].setBackground(getResources().getDrawable(R.drawable.item_custom_half_deleted));
                                             dialogTriggered = true;
                                         } else {
