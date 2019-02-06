@@ -28,10 +28,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static rsweny.quicklist.com.quicklist.R.id.fill_horizontal;
 
 public class MainActivity extends AppCompatActivity {
+
+    Database myDb;
 
     private TextView itemDeletionTextView;
     private float x1, x2;
@@ -51,15 +54,15 @@ public class MainActivity extends AppCompatActivity {
     private Button btn;
     private int finalI;
     private float halfW;
+
+
+    // items for database
     private String item_name;
+    private int notification_time;
 
     private Animation animationHolder;
 
-
-
     ArrayList<String> userItems = new ArrayList<>();
-
-
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -70,12 +73,17 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Initialize database
+        myDb = new Database(this);
+
         scrollerlinearlayout = findViewById(R.id.scrollerlinearlayout);
         linearLayout = findViewById(R.id.linearLayout);
         itemDeletionTextView = findViewById(R.id.itemDeletionTextView);
         spinner = findViewById(R.id.spinner);
 
+
         userItems.add("Test Item");
+        AddData(userItems.get(0) , 0);
         updateItems();
 
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -93,6 +101,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // Add Test Item to database
+    public void AddData(String item_name, Integer notification_time) {
+        boolean isInserted = myDb.insertData(item_name, notification_time);
+
+        if(isInserted == true) {
+            Log.i("Data", "Data inserted successfully");
+        } else
+            Log.i("Data", "Data not Inserted");
+    } // Add data
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -274,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
             ItemEntrydialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             ItemEntrydialog.setCancelable(false);
             ItemEntrydialog.setContentView(R.layout.custom_item_entry);
-            ItemEntrydialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            Objects.requireNonNull(ItemEntrydialog.getWindow()).setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
             // If the user chooses no
             FrameLayout mDialogNo = ItemEntrydialog.findViewById(R.id.frmNo);
