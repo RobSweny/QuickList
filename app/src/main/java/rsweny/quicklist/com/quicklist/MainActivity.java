@@ -3,6 +3,7 @@ package rsweny.quicklist.com.quicklist;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,8 +11,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -87,12 +86,13 @@ public class MainActivity extends AppCompatActivity {
         AddData(userItems.get(0) , 0);
         updateItems();
 
+        viewAllItems();
+
+        // On floating action button click
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Show keyboard
-
                 // Create custom dialog box to input new items
                 ItemEntry itemAdded = new ItemEntry();
                 itemAdded.showItemEntryDialog(MainActivity.this);
@@ -100,57 +100,91 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-    }
+    }  // End onCreate
+
+    /*
+     ____        _        _                      _____                 _   _
+    |  _ \  __ _| |_ __ _| |__   __ _ ___  ___  |  ___|   _ _ __   ___| |_(_) ___  _ __  ___
+    | | | |/ _` | __/ _` | '_ \ / _` / __|/ _ \ | |_ | | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+    | |_| | (_| | || (_| | |_) | (_| \__ \  __/ |  _|| |_| | | | | (__| |_| | (_) | | | \__ \
+    |____/ \__,_|\__\__,_|_.__/ \__,_|___/\___| |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+
+    */
 
     // Add data from database
     public void AddData(String item_name, Integer notification_time) {
         boolean isInserted = myDb.insertData(item_name, notification_time);
 
-        if(isInserted == true) {
+        if(isInserted) {
             Log.i("Data", "Data inserted successfully");
         } else
             Log.i("Data", "Data not Inserted");
-    } // Add data
+    } // End Add Data
 
     // Delete data from database
     public void DeleteData(String item_name) {
-
             Integer deletedRows = myDb.deleteData(item_name);
-
 
             if(deletedRows > 0) {
                 Log.i("Data", "Data Deleted");
             } else
                 Log.i("Data", "Data not Deleted");
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_main, menu);
-
-        return true;
-    }
+    } // End Delete Data
 
 
+    public void viewAllItems() {
+        Cursor res = myDb.getAllItems();
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if(res.getCount() == 0) {
+            // show message
+            Log.i("Error","No Items Found");
+            return;
         }
 
-        return super.onOptionsItemSelected(item);
-    }
+        StringBuffer buffer = new StringBuffer();
+        while (res.moveToNext()) {
+            // Retrieve items from column 1
+            buffer.append("Item Name: "+ res.getString(1) +"\n");
+        }
+
+        // Show all data
+        Log.i("Data", buffer.toString());
+    } // End View All Items
+
+
+    public void viewAllNotifications() {
+        Cursor res = myDb.getAllItems();
+
+        if(res.getCount() == 0) {
+            // show message
+            Log.i("Error","No Notifications Found");
+            return;
+        }
+
+        StringBuffer buffer = new StringBuffer();
+        while (res.moveToNext()) {
+            // Retrieve items from column 2
+            buffer.append("Item Name: "+ res.getString(2) +"\n");
+        }
+
+        // Show all data
+        Log.i("Data", buffer.toString());
+    } // End View All Items
 
 
 
+
+
+    /*
+
+      _   _           _       _         ___ _
+     | | | |_ __   __| | __ _| |_ ___  |_ _| |_ ___ _ __ ___  ___
+     | | | | '_ \ / _` |/ _` | __/ _ \  | || __/ _ \ '_ ` _ \/ __|
+     | |_| | |_) | (_| | (_| | ||  __/  | || ||  __/ | | | | \__ \
+      \___/| .__/ \__,_|\__,_|\__\___| |___|\__\___|_| |_| |_|___/
+           |_|
+
+    */
 
     @SuppressLint("ClickableViewAccessibility")
     public void updateItems () {
@@ -301,8 +335,18 @@ public class MainActivity extends AppCompatActivity {
             scrollerlinearlayout.addView(btn[i]);
             btn[i].setAnimation(AnimationUtils.loadAnimation(MainActivity.this,R.anim.right_to_left));
         } // End for
-    }
+    } // End updateItems
 
+
+    /*
+         _       _     _ _               ___ _
+        / \   __| | __| (_)_ __   __ _  |_ _| |_ ___ _ __ ___  ___
+       / _ \ / _` |/ _` | | '_ \ / _` |  | || __/ _ \ '_ ` _ \/ __|
+      / ___ \ (_| | (_| | | | | | (_| |  | || ||  __/ | | | | \__ \
+     /_/   \_\__,_|\__,_|_|_| |_|\__, | |___|\__\___|_| |_| |_|___/
+                                 |___/
+
+    */
 
     // Adding Items to user list
     public class ItemEntry {
