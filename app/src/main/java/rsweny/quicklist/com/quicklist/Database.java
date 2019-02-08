@@ -43,9 +43,15 @@ public class Database extends SQLiteOpenHelper {
             return true;
     }
 
-    public Cursor getAllData() {
+    public Cursor getAllItems() {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("select * from "+TABLE_NAME,null);
+        Cursor res = db.rawQuery("select * from " + COL_2,null);
+        return res;
+    }
+
+    public Cursor getAllNotifications() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select * from " + COL_3,null);
         return res;
     }
 
@@ -58,8 +64,8 @@ public class Database extends SQLiteOpenHelper {
         return true;
     }
 
-    public Integer deleteData (String id) {
+    public Integer deleteData (String item_name) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete(TABLE_NAME, "ID = ?",new String[] {id});
+        return db.delete(TABLE_NAME, "ITEM_NAME = ?",new String[] { item_name});
     }
 }

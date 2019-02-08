@@ -30,7 +30,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static rsweny.quicklist.com.quicklist.R.id.fill_horizontal;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -101,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // Add Test Item to database
+    // Add data from database
     public void AddData(String item_name, Integer notification_time) {
         boolean isInserted = myDb.insertData(item_name, notification_time);
 
@@ -110,6 +111,18 @@ public class MainActivity extends AppCompatActivity {
         } else
             Log.i("Data", "Data not Inserted");
     } // Add data
+
+    // Delete data from database
+    public void DeleteData(String item_name) {
+
+            Integer deletedRows = myDb.deleteData(item_name);
+
+
+            if(deletedRows > 0) {
+                Log.i("Data", "Data Deleted");
+            } else
+                Log.i("Data", "Data not Deleted");
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -161,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
             final int id = btn[i].getId();
             btn[i].setText(userItems.get(i));
             btn[i].setHeight(75);
-            btn[i].setWidth(fill_horizontal);
+            btn[i].setWidth(WRAP_CONTENT);
             btn[i].setTextColor(getColor(R.color.colorBlack));
             LinearLayout.LayoutParams buttonLayoutParams = new LinearLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
             buttonLayoutParams.setMargins(30, 30, 30, 30);
@@ -235,8 +248,14 @@ public class MainActivity extends AppCompatActivity {
                                                         removeItemHolder = string;
                                                     } // End search
                                                 }
+
+                                                // Remove from database
+                                                DeleteData(removeItemHolder);
+
                                                 // Remove the item from arraylist
                                                 userItems.remove(removeItemHolder);
+
+
 
 
                                                 dialog.cancel();
@@ -259,14 +278,15 @@ public class MainActivity extends AppCompatActivity {
                                         int currentButtonPositionInt = (int) btn[finalI].getX();
                                         Log.i("Button position", String.valueOf(currentButtonPositionInt));
 
-                                        if(currentButtonPositionInt > 350){
+                                        // TODO 1: Issue where user swipes right slowly, not registering as a motion but still triggering button change.
+                                        if(currentButtonPositionInt < 400){
+                                            btn[finalI].setX(btn[finalI].getX() + (event.getX() - x1));
+                                        } else {
                                             // Set the button to half delete
-                                            // TODO 1: Issue where user swipes right slowly, not registering as a motion but still triggering button change.
                                             btn[finalI].setBackground(getResources().getDrawable(R.drawable.item_custom_half_deleted));
                                             dialogTriggered = true;
-                                        } else {
-                                            btn[finalI].setX(btn[finalI].getX() + (event.getX() - x1));
                                         }
+
                                     } // Dont allow use to swipe left
 
 
