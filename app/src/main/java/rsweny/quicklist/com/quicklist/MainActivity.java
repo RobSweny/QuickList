@@ -3,6 +3,7 @@ package rsweny.quicklist.com.quicklist;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -59,11 +60,11 @@ public class MainActivity extends AppCompatActivity {
     // items for database
     private String item_name;
     private int notification_time;
-
+    final String PREFS_NAME = "MyPrefsFile";
     private Animation animationHolder;
 
     ArrayList<String> userItems = new ArrayList<>();
-
+    ArrayList<Integer> userNotifications = new ArrayList<>();
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -81,12 +82,27 @@ public class MainActivity extends AppCompatActivity {
         itemDeletionTextView = findViewById(R.id.itemDeletionTextView);
         spinner = findViewById(R.id.spinner);
 
+        // Adding shared preferences to avoid users getting "Test Item" each time
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 
-        userItems.add("Test Item");
-        AddData(userItems.get(0) , 0);
-        updateItems();
+        // Check if users first time using application
+        if (settings.getBoolean("first_time_user", true)) {
+            Log.i("Comments", "First time");
 
-        viewAllItems();
+            // first time task
+            userItems.add("Test Item");
+            userNotifications.add(0);
+
+            AddData(userItems.get(0) , userNotifications.get(0));
+            updateItems();
+
+            // record the fact that the app has been started at least once
+            settings.edit().putBoolean("first_time_user", false).apply();
+        } else {
+            viewAllItems();
+            viewAllNotifications();
+            updateItems();
+        } // End if
 
         // On floating action button click
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -134,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void viewAllItems() {
         Cursor res = myDb.getAllItems();
+        String tempItem;
 
         if(res.getCount() == 0) {
             // show message
@@ -145,6 +162,9 @@ public class MainActivity extends AppCompatActivity {
         while (res.moveToNext()) {
             // Retrieve items from column 1
             buffer.append("Item Name: "+ res.getString(1) +"\n");
+            userItems.add(res.getString(1));
+
+            Log.i("Item Name:", res.getString(1) +"\n");
         }
 
         // Show all data
@@ -164,7 +184,10 @@ public class MainActivity extends AppCompatActivity {
         StringBuffer buffer = new StringBuffer();
         while (res.moveToNext()) {
             // Retrieve items from column 2
-            buffer.append("Item Name: "+ res.getString(2) +"\n");
+            buffer.append("Notification Times: "+ res.getString(2) +"\n");
+
+
+            Log.i("Notification Times: ", res.getString(2) +"\n");
         }
 
         // Show all data
@@ -285,6 +308,7 @@ public class MainActivity extends AppCompatActivity {
 
                                                 // Remove from database
                                                 DeleteData(removeItemHolder);
+
 
                                                 // Remove the item from arraylist
                                                 userItems.remove(removeItemHolder);
